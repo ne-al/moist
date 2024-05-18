@@ -1,7 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moist/app/screen/pages/home.dart';
+import 'package:moist/app/components/bottom_navbar/bottom_navbar.dart';
 import 'package:moist/core/handler/audio_handler.dart';
 
 late AudioPlayerHandler audioHandler;
@@ -40,7 +40,7 @@ class MoistApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
       ),
-      home: const HomePage(),
+      home: const BottomNavBar(),
     );
   }
 }
