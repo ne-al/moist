@@ -7,6 +7,7 @@ import 'package:moist/app/components/textfield/search/search_textfield.dart';
 import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/core/api/saavn/api.dart';
 import 'package:moist/core/helper/extension.dart';
+import 'package:moist/core/helper/format.dart';
 import 'package:moist/core/manager/media_manager.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
@@ -19,6 +20,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Map<dynamic, dynamic> data = {};
+  List tiles = [];
   List<dynamic> collection = [];
   Logger logger = Logger();
   bool _isLoading = false;
@@ -49,11 +51,17 @@ class _HomePageState extends State<HomePage> {
 
     data = await SaavnAPI().fetchHomePageData();
 
+    Map formatedData = await FormatResponse.formatPromoLists(data);
+    Map modules = formatedData['modules'];
+    modules.forEach((key, value) {
+      tiles.add({
+        'title': value['title'],
+      });
+    });
+
     collection = data['collections'];
 
     List newCollection = [];
-
-    collection.removeWhere((element) => element.toString().startsWith("promo"));
 
     for (var element in collection) {
       if (data[element] != null) {
@@ -64,6 +72,8 @@ class _HomePageState extends State<HomePage> {
     collection.clear();
 
     collection.addAll(newCollection);
+
+    logger.d(tiles[1]['title']);
 
     setState(() {
       _isLoading = false;
@@ -86,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                             : name == "city_mod"
                                 ? "POPULAR NEAR YOU"
                                 : name == "artist_recos"
-                                    ? "RECOMMENDED ARTISTS"
+                                    ? "ARTIST'S RADIO"
                                     : name;
 
     return newName;
@@ -147,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                               vertical: 14,
                             ),
                             child: Text(
-                              playlistName(collection[index].toString()),
+                              tiles[index]['title'].toString(),
                               style: GoogleFonts.oswald(
                                 fontSize: 28,
                                 fontWeight: FontWeight.w600,

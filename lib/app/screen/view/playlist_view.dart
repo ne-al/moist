@@ -37,6 +37,7 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   Future<void> _getData() async {
+    List list = [];
     if (widget.type == 'album') {
       songMap = await SaavnAPI().fetchAlbumSongs(widget.id);
 
@@ -63,6 +64,21 @@ class _PlaylistViewState extends State<PlaylistView> {
       MediaItem song = MapToMediaItem().mapToMediaItem(songMap);
 
       mediaItem.add(song);
+    } else if (widget.type == 'show') {
+      Map songMap = await SaavnAPI().getSongFromToken(
+          widget.list!['perma_url'].toString().split('/').last, 'show',
+          n: 500 * 1, p: 1);
+      list = songMap['songs'].map((e) {
+        e['url'] = e['url']
+            .toString()
+            .substring(0, e['url'].toString().lastIndexOf('.') + 4);
+
+        return e;
+      }).toList();
+
+      for (var item in list) {
+        mediaItem.add(MapToMediaItem().mapToMediaItem(item));
+      }
     }
 
     setState(() {});

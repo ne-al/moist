@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:moist/core/handler/audio_handler.dart';
 import 'package:moist/core/handler/queue_state.dart';
 import 'package:moist/core/helper/common.dart';
@@ -62,8 +63,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 },
               ),
             ),
-            // Playback controls
-            ControlButtons(audioHandler),
+            const Gap(20),
             // A seek bar.
             StreamBuilder<PositionData>(
               stream: _positionDataStream,
@@ -80,9 +80,13 @@ class _MusicPlayerState extends State<MusicPlayer> {
                 );
               },
             ),
+            // Playback controls
+            ControlButtons(audioHandler),
+
             const SizedBox(height: 8.0),
             // Repeat/shuffle controls
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 StreamBuilder<AudioServiceRepeatMode>(
                   stream: audioHandler.playbackState
@@ -112,13 +116,6 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     );
                   },
                 ),
-                Expanded(
-                  child: Text(
-                    "Playlist",
-                    style: Theme.of(context).textTheme.titleLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
                 StreamBuilder<bool>(
                   stream: audioHandler.playbackState
                       .map((state) =>
@@ -142,48 +139,48 @@ class _MusicPlayerState extends State<MusicPlayer> {
               ],
             ),
             // Playlist
-            SizedBox(
-              height: 240.0,
-              child: StreamBuilder<QueueState>(
-                stream: audioHandler.queueState,
-                builder: (context, snapshot) {
-                  final queueState = snapshot.data ?? QueueState.empty;
-                  final queue = queueState.queue;
-                  return ReorderableListView(
-                    onReorder: (int oldIndex, int newIndex) {
-                      if (oldIndex < newIndex) newIndex--;
-                      audioHandler.moveQueueItem(oldIndex, newIndex);
-                    },
-                    children: [
-                      for (var i = 0; i < queue.length; i++)
-                        Dismissible(
-                          key: ValueKey(queue[i].id),
-                          background: Container(
-                            color: Colors.redAccent,
-                            alignment: Alignment.centerRight,
-                            child: const Padding(
-                              padding: EdgeInsets.only(right: 8.0),
-                              child: Icon(Icons.delete, color: Colors.white),
-                            ),
-                          ),
-                          onDismissed: (dismissDirection) {
-                            audioHandler.removeQueueItemAt(i);
-                          },
-                          child: Material(
-                            color: i == queueState.queueIndex
-                                ? Colors.grey.shade300
-                                : null,
-                            child: ListTile(
-                              title: Text(queue[i].title),
-                              onTap: () => audioHandler.skipToQueueItem(i),
-                            ),
-                          ),
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ),
+            // SizedBox(
+            //   height: 240.0,
+            //   child: StreamBuilder<QueueState>(
+            //     stream: audioHandler.queueState,
+            //     builder: (context, snapshot) {
+            //       final queueState = snapshot.data ?? QueueState.empty;
+            //       final queue = queueState.queue;
+            //       return ReorderableListView(
+            //         onReorder: (int oldIndex, int newIndex) {
+            //           if (oldIndex < newIndex) newIndex--;
+            //           audioHandler.moveQueueItem(oldIndex, newIndex);
+            //         },
+            //         children: [
+            //           for (var i = 0; i < queue.length; i++)
+            //             Dismissible(
+            //               key: ValueKey(queue[i].id),
+            //               background: Container(
+            //                 color: Colors.redAccent,
+            //                 alignment: Alignment.centerRight,
+            //                 child: const Padding(
+            //                   padding: EdgeInsets.only(right: 8.0),
+            //                   child: Icon(Icons.delete, color: Colors.white),
+            //                 ),
+            //               ),
+            //               onDismissed: (dismissDirection) {
+            //                 audioHandler.removeQueueItemAt(i);
+            //               },
+            //               child: Material(
+            //                 color: i == queueState.queueIndex
+            //                     ? Colors.grey.shade300
+            //                     : null,
+            //                 child: ListTile(
+            //                   title: Text(queue[i].title),
+            //                   onTap: () => audioHandler.skipToQueueItem(i),
+            //                 ),
+            //               ),
+            //             ),
+            //         ],
+            //       );
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
