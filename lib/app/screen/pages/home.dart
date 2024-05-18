@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 import 'package:moist/app/components/textfield/search/search_textfield.dart';
+import 'package:moist/app/screen/pages/search.dart';
 import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/core/api/saavn/api.dart';
 import 'package:moist/core/helper/extension.dart';
@@ -56,6 +57,7 @@ class _HomePageState extends State<HomePage> {
     modules.forEach((key, value) {
       tiles.add({
         'title': value['title'],
+        'items': formatedData[key],
       });
     });
 
@@ -72,6 +74,8 @@ class _HomePageState extends State<HomePage> {
     collection.clear();
 
     collection.addAll(newCollection);
+
+    logger.e(tiles);
 
     setState(() {
       _isLoading = false;
@@ -117,13 +121,18 @@ class _HomePageState extends State<HomePage> {
                                   horizontal: 12,
                                   vertical: 10,
                                 ),
-                                child: SearchTextField(
-                                  controller: _searchController,
-                                  focusNode: _searchFocus,
-                                  hintText: 'Search',
-                                  onSubmitted: (value) {
-                                    _searchFocus.unfocus();
-                                  },
+                                child: Hero(
+                                  tag: 'search',
+                                  child: SearchTextField(
+                                    controller: _searchController,
+                                    hintText: 'Search',
+                                    onTap: () {
+                                      pushScreenWithNavBar(
+                                        context,
+                                        const SearchPage(),
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                               CustomScrollView(
@@ -135,15 +144,14 @@ class _HomePageState extends State<HomePage> {
                                     separatorBuilder: (context, index) =>
                                         Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 14,
+                                        horizontal: 14,
+                                        vertical: 8,
                                       ),
                                       child: Text(
                                         tiles[index]['title'].toString(),
                                         style: GoogleFonts.oswald(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 1.2,
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
                                     ),
@@ -159,7 +167,7 @@ class _HomePageState extends State<HomePage> {
                                       var homeData = data[collectionName];
 
                                       return SizedBox(
-                                        height: constraints.maxHeight * 0.24,
+                                        height: constraints.maxHeight * 0.18,
                                         child: SingleChildScrollView(
                                           scrollDirection: Axis.horizontal,
                                           child: CustomScrollView(
@@ -172,6 +180,7 @@ class _HomePageState extends State<HomePage> {
                                                 gridDelegate:
                                                     const SliverGridDelegateWithFixedCrossAxisCount(
                                                   crossAxisCount: 1,
+                                                  mainAxisSpacing: 0,
                                                 ),
                                                 itemCount: homeData.length,
                                                 itemBuilder:
@@ -210,11 +219,6 @@ class _HomePageState extends State<HomePage> {
                                                           MaterialPageRoute(
                                                             builder: (context) =>
                                                                 PlaylistView(
-                                                              id: id,
-                                                              thumbnailUrl:
-                                                                  thumbnailUrl,
-                                                              title: title,
-                                                              type: type,
                                                               list: homeData[
                                                                   childIndex],
                                                             ),
@@ -226,18 +230,22 @@ class _HomePageState extends State<HomePage> {
                                                       children: [
                                                         type != "radio_station"
                                                             ? Flexible(
-                                                                child:
-                                                                    ClipRRect(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              12),
+                                                                child: SizedBox(
                                                                   child:
-                                                                      CachedNetworkImage(
-                                                                    imageUrl:
-                                                                        thumbnailUrl,
-                                                                    fit: BoxFit
-                                                                        .cover,
+                                                                      Container(
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              16.0), // Adjust the radius as needed
+                                                                      image:
+                                                                          DecorationImage(
+                                                                        image: CachedNetworkImageProvider(
+                                                                            thumbnailUrl),
+                                                                        fit: BoxFit
+                                                                            .contain,
+                                                                      ),
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               )
@@ -246,18 +254,27 @@ class _HomePageState extends State<HomePage> {
                                                                     CircleAvatar(
                                                                   backgroundImage:
                                                                       CachedNetworkImageProvider(
-                                                                          thumbnailUrl),
+                                                                    thumbnailUrl,
+                                                                  ),
                                                                   radius: 100,
                                                                 ),
                                                               ),
                                                         const Gap(4),
-                                                        Text(
-                                                          title,
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          style: GoogleFonts
-                                                              .oswald(),
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                            horizontal: 20,
+                                                          ),
+                                                          child: Text(
+                                                            title,
+                                                            maxLines: 1,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: GoogleFonts
+                                                                .oswald(),
+                                                          ),
                                                         ),
                                                       ],
                                                     ),

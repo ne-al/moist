@@ -2,23 +2,30 @@ import 'package:flutter/material.dart';
 
 class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
   final String hintText;
+  final bool autoFocus;
   final Function(String)? onSubmitted;
+  final Function()? onTap;
+  final Function(String)? onChanged;
   const SearchTextField({
     super.key,
     required this.controller,
-    required this.focusNode,
+    this.focusNode,
     required this.hintText,
-    required this.onSubmitted,
+    this.autoFocus = false,
+    this.onSubmitted,
+    this.onTap,
+    this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onTap: onTap,
       controller: controller,
       focusNode: focusNode,
-      autofocus: false,
+      autofocus: autoFocus,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.search),
         hintText: 'Search',
@@ -30,6 +37,7 @@ class SearchTextField extends StatelessWidget {
         fillColor: Colors.grey.shade800.withOpacity(0.3),
       ),
       onSubmitted: onSubmitted,
+      onChanged: onChanged,
     );
   }
 }

@@ -5,21 +5,14 @@ import 'package:gap/gap.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:moist/app/widgets/songtile/songtile.dart';
 import 'package:moist/core/api/saavn/api.dart';
+import 'package:moist/core/helper/extension.dart';
 import 'package:moist/core/helper/map_to_media_item.dart';
 
 class PlaylistView extends StatefulWidget {
-  final String id;
-  final String type;
-  final String title;
-  final String thumbnailUrl;
-  final Map? list;
+  final Map list;
   const PlaylistView({
     super.key,
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.thumbnailUrl,
-    this.list,
+    required this.list,
   });
 
   @override
@@ -28,7 +21,10 @@ class PlaylistView extends StatefulWidget {
 
 class _PlaylistViewState extends State<PlaylistView> {
   Map songMap = {};
+  String thumbnailUrl = "";
+  String title = "";
   List<MediaItem> mediaItem = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -37,36 +33,45 @@ class _PlaylistViewState extends State<PlaylistView> {
   }
 
   Future<void> _getData() async {
+    setState(() {
+      isLoading = true;
+    });
+
     List list = [];
-    if (widget.type == 'album') {
-      songMap = await SaavnAPI().fetchAlbumSongs(widget.id);
+
+    thumbnailUrl =
+        widget.list['image'].toString().replaceAll('150x150', '500x500');
+    title = widget.list['title'].toString().unescape();
+
+    if (widget.list['type'] == 'album') {
+      songMap = await SaavnAPI().fetchAlbumSongs(widget.list['id']);
 
       for (var item in songMap['songs']) {
         mediaItem.add(MapToMediaItem().mapToMediaItem(item));
       }
-    } else if (widget.type == 'mix') {
+    } else if (widget.list['type'] == 'mix') {
       songMap = await SaavnAPI().getSongFromToken(
-          widget.list!['perma_url'].toString().split('/').last, 'mix',
+          widget.list['perma_url'].toString().split('/').last, 'mix',
           n: 500 * 1, p: 1);
 
       for (var item in songMap['songs']) {
         mediaItem.add(MapToMediaItem().mapToMediaItem(item));
       }
-    } else if (widget.type == 'playlist') {
-      songMap = await SaavnAPI().fetchPlaylistSongs(widget.id);
+    } else if (widget.list['type'] == 'playlist') {
+      songMap = await SaavnAPI().fetchPlaylistSongs(widget.list['id']);
 
       for (var item in songMap['songs']) {
         mediaItem.add(MapToMediaItem().mapToMediaItem(item));
       }
-    } else if (widget.type == 'song') {
-      songMap = await SaavnAPI().fetchSongDetails(widget.id);
+    } else if (widget.list['type'] == 'song') {
+      songMap = await SaavnAPI().fetchSongDetails(widget.list['id']);
 
       MediaItem song = MapToMediaItem().mapToMediaItem(songMap);
 
       mediaItem.add(song);
-    } else if (widget.type == 'show') {
+    } else if (widget.list['type'] == 'show') {
       Map songMap = await SaavnAPI().getSongFromToken(
-          widget.list!['perma_url'].toString().split('/').last, 'show',
+          widget.list['perma_url'].toString().split('/').last, 'show',
           n: 500 * 1, p: 1);
       list = songMap['songs'].map((e) {
         e['url'] = e['url']
@@ -81,7 +86,9 @@ class _PlaylistViewState extends State<PlaylistView> {
       }
     }
 
-    setState(() {});
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -113,7 +120,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: CachedNetworkImage(
-                                  imageUrl: widget.thumbnailUrl,
+                                  imageUrl: thumbnailUrl,
                                 ),
                               ),
                             ),
@@ -124,7 +131,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    widget.title,
+                                    title,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.oswald(
@@ -133,7 +140,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                                   ),
                                   const Gap(6),
                                   Text(
-                                    widget.type,
+                                    widget.list['type'],
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.oswald(
@@ -152,13 +159,23 @@ class _PlaylistViewState extends State<PlaylistView> {
                     ),
                   ),
                 ),
-                SliverList.builder(
-                  itemCount: mediaItem.length,
-                  itemBuilder: (context, index) {
-                    var song = mediaItem[index];
-                    return SongTile(song: song);
-                  },
-                )
+                !isLoading
+                    ? mediaItem.isNotEmpty
+                        ? SliverList.builder(
+                            itemCount: mediaItem.length,
+                            itemBuilder: (context, index) {
+                              var song = mediaItem[index];
+                              return SongTile(song: song);
+                            },
+                          )
+                        : const SliverToBoxAdapter(
+                            child: Center(
+                              child: Text('NO SONGS FOUND'),
+                            ),
+                          )
+                    : const SliverToBoxAdapter(
+                        child: LinearProgressIndicator(),
+                      ),
               ],
             ),
           );
