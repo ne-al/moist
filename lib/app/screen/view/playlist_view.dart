@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -130,12 +131,13 @@ class _PlaylistViewState extends State<PlaylistView> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
+                                  AutoSizeText(
                                     title,
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.oswald(
-                                      fontSize: 18,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   const Gap(6),
@@ -146,6 +148,7 @@ class _PlaylistViewState extends State<PlaylistView> {
                                     style: GoogleFonts.oswald(
                                       fontSize: 18,
                                       color: Colors.grey.shade500,
+                                      fontWeight: FontWeight.w300,
                                     ),
                                   ),
                                 ],
