@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/app/theme/text_style.dart';
 import 'package:moist/core/helper/image_res_modifier.dart';
+import 'package:moist/core/manager/media_manager.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class HomePageTile extends StatefulWidget {
@@ -73,7 +74,7 @@ class _HomePageTileState extends State<HomePageTile> {
                   // }
 
                   if (song['type'] == 'radio_station') {
-                    return;
+                    MediaManager().playRadio(song, context);
                   } else {
                     pushScreenWithNavBar(context, PlaylistView(list: song));
                   }

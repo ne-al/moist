@@ -1,13 +1,13 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:moist/app/screen/music_player.dart';
 import 'package:moist/core/api/saavn/api.dart';
+import 'package:moist/core/helper/map_to_media_item.dart';
 import 'package:moist/main.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class MediaManager {
-  Future<void> playRadio(item) async {
+  Future<void> playRadio(item, BuildContext context) async {
     String? stationId = await SaavnAPI().createRadio(
       names: item['more_info']['featured_station_type'].toString() == 'artist'
           ? [item['more_info']['query'].toString()]
@@ -19,8 +19,19 @@ class MediaManager {
     if (stationId == null) return;
     List songs = await SaavnAPI().getRadioSongs(stationId: stationId);
 
-    //TODO add play back logic here
-    Logger().d(songs);
+    List<MediaItem> mediaItems = [];
+
+    for (var item in songs) {
+      mediaItems.add(MapToMediaItem().mapToMediaItem(item));
+    }
+    if (!context.mounted) return;
+    pushScreenWithoutNavBar(
+      context,
+      const MusicPlayer(),
+    );
+
+    await audioHandler.updateQueue(mediaItems);
+    audioHandler.play();
   }
 
   Future<void> addAndPlay(MediaItem song, BuildContext context) async {

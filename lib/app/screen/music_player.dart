@@ -60,6 +60,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
                                 child: CachedNetworkImage(
                                   imageUrl: mediaItem.artUri!.toString(),
                                   fit: BoxFit.cover,
+                                  width: constraints.maxWidth * 0.92,
+                                  height: constraints.maxWidth * 0.92,
                                 ),
                               ),
                             ),
