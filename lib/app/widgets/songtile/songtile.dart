@@ -1,7 +1,9 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:moist/app/screen/music_player.dart';
 import 'package:moist/main.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class SongTile extends StatelessWidget {
   final MediaItem song;
@@ -44,6 +46,11 @@ class SongTile extends StatelessWidget {
             await audioHandler.updateQueue([song]);
 
             audioHandler.play();
+            if (!context.mounted) return;
+            pushScreenWithoutNavBar(
+              context,
+              const MusicPlayer(),
+            );
           },
         );
       },
