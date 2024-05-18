@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gap/gap.dart';
 import 'package:logger/logger.dart';
 import 'package:moist/app/components/home_page_tile.dart';
 import 'package:moist/app/components/textfield/search/search_textfield.dart';
@@ -54,21 +55,33 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: SearchTextField(
-          controller: _searchController,
-          readOnly: true,
-          onTap: () {
-            pushScreenWithNavBar(context, const SearchPage());
-          },
+        title: Hero(
+          tag: 'search',
+          child: SearchTextField(
+            controller: _searchController,
+            readOnly: true,
+            onTap: () {
+              pushScreenWithNavBar(context, const SearchPage());
+            },
+          ),
         ),
       ),
       body: RefreshIndicator(
         onRefresh: () => _getData(),
         child: !_isLoading
-            ? ListView(
-                children: songs
-                    .map((item) => HomePageTile(sectionIitem: item))
-                    .toList(),
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Gap(12),
+                    ListView(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: songs
+                          .map((item) => HomePageTile(sectionIitem: item))
+                          .toList(),
+                    ),
+                  ],
+                ),
               )
             : const Center(
                 child: CircularProgressIndicator.adaptive(),

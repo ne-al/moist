@@ -1,5 +1,10 @@
+import 'package:audio_service/audio_service.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
+import 'package:moist/app/screen/music_player.dart';
 import 'package:moist/core/api/saavn/api.dart';
+import 'package:moist/main.dart';
+import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class MediaManager {
   Future<void> playRadio(item) async {
@@ -16,5 +21,17 @@ class MediaManager {
 
     //TODO add play back logic here
     Logger().d(songs);
+  }
+
+  Future<void> addAndPlay(MediaItem song, BuildContext context) async {
+    pushScreenWithoutNavBar(
+      context,
+      const MusicPlayer(),
+    );
+
+    if (audioHandler.mediaItem.value != song) {
+      await audioHandler.updateQueue([song]);
+      audioHandler.play();
+    }
   }
 }

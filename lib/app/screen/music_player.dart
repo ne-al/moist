@@ -66,7 +66,8 @@ class _MusicPlayerState extends State<MusicPlayer> {
                           ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 54, vertical: 16),
+                            horizontal: 54,
+                          ),
                           child: Column(
                             children: [
                               Text(
@@ -95,7 +96,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                     );
                   },
                 ),
-
+                const Gap(18),
                 // A seek bar.
                 StreamBuilder<PositionData>(
                   stream: _positionDataStream,
@@ -104,7 +105,7 @@ class _MusicPlayerState extends State<MusicPlayer> {
                         PositionData(
                             Duration.zero, Duration.zero, Duration.zero);
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 26),
                       child: ProgressBar(
                         total: positionData.duration,
                         progress: positionData.position,
@@ -113,6 +114,9 @@ class _MusicPlayerState extends State<MusicPlayer> {
                           audioHandler.seek(newPosition);
                         },
                         timeLabelLocation: TimeLabelLocation.sides,
+                        timeLabelTextStyle: GoogleFonts.oswald(),
+                        barHeight: 3,
+                        thumbRadius: 5,
                       ),
                     );
                   },

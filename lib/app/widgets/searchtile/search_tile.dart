@@ -3,12 +3,11 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:moist/app/screen/music_player.dart';
 import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/app/theme/text_style.dart';
 import 'package:moist/core/helper/extension.dart';
 import 'package:moist/core/helper/map_to_media_item.dart';
-import 'package:moist/main.dart';
+import 'package:moist/core/manager/media_manager.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class SearchTile extends StatelessWidget {
@@ -21,16 +20,13 @@ class SearchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: () {
+      onTap: () async {
         if (item['type'] == 'song' || item['type'] == 'video') {
           MediaItem mediaItem = MapToMediaItem().mapToMediaItem(item);
 
-          audioHandler.updateQueue([mediaItem]);
-          audioHandler.play();
-
-          pushScreenWithoutNavBar(
+          MediaManager().addAndPlay(
+            mediaItem,
             context,
-            const MusicPlayer(),
           );
         } else if (item['type'] == 'album') {
           pushScreenWithNavBar(context, PlaylistView(list: item));
