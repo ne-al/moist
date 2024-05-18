@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode? focusNode;
-  final String hintText;
   final bool autoFocus;
   final Function(String)? onSubmitted;
   final Function()? onTap;
   final Function(String)? onChanged;
+  final bool readOnly;
   const SearchTextField({
     super.key,
     required this.controller,
     this.focusNode,
-    required this.hintText,
     this.autoFocus = false,
     this.onSubmitted,
     this.onTap,
     this.onChanged,
+    this.readOnly = false,
   });
 
   @override
@@ -26,6 +26,7 @@ class SearchTextField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       autofocus: autoFocus,
+      readOnly: readOnly,
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.search),
         hintText: 'Search',

@@ -29,7 +29,6 @@ class _SearchPageState extends State<SearchPage> {
           child: SearchTextField(
             autoFocus: true,
             controller: _searchController,
-            hintText: 'Search',
             onChanged: (value) => getHints(value),
             onSubmitted: (value) => searchItems(value),
           ),

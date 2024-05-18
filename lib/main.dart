@@ -1,5 +1,6 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moist/app/components/bottom_navbar/bottom_navbar.dart';
 import 'package:moist/core/handler/audio_handler.dart';
@@ -8,9 +9,7 @@ late AudioPlayerHandler audioHandler;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  //! add flutter display mode later
-
+  await FlutterDisplayMode.setHighRefreshRate();
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandlerImpl(),
     config: const AudioServiceConfig(

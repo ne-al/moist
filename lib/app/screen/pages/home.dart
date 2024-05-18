@@ -1,15 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:gap/gap.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
+import 'package:moist/app/components/home_page_tile.dart';
 import 'package:moist/app/components/textfield/search/search_textfield.dart';
 import 'package:moist/app/screen/pages/search.dart';
-import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/core/api/saavn/api.dart';
-import 'package:moist/core/helper/extension.dart';
 import 'package:moist/core/helper/format.dart';
-import 'package:moist/core/manager/media_manager.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,14 +14,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin<HomePage> {
   Map<dynamic, dynamic> data = {};
-  List tiles = [];
-  List<dynamic> collection = [];
+  List songs = [];
   Logger logger = Logger();
   bool _isLoading = false;
   final TextEditingController _searchController = TextEditingController();
-  final FocusNode _searchFocus = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -34,18 +28,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _getData() async {
-    /**
-     [
-       "new_trending",
-       "charts",
-       "new_albums",
-       "tag_mixes",
-       "top_playlists",
-       "radio",
-       "city_mod",
-       "artist_recos"
-     ]
-     **/
     setState(() {
       _isLoading = true;
     });
@@ -55,27 +37,11 @@ class _HomePageState extends State<HomePage> {
     Map formatedData = await FormatResponse.formatPromoLists(data);
     Map modules = formatedData['modules'];
     modules.forEach((key, value) {
-      tiles.add({
+      songs.add({
         'title': value['title'],
         'items': formatedData[key],
       });
     });
-
-    collection = data['collections'];
-
-    List newCollection = [];
-
-    for (var element in collection) {
-      if (data[element] != null) {
-        newCollection.add(element);
-      }
-    }
-
-    collection.clear();
-
-    collection.addAll(newCollection);
-
-    logger.e(tiles);
 
     setState(() {
       _isLoading = false;
@@ -84,225 +50,33 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                SliverAppBar(
-                  title: Text(
-                    'MOIST',
-                    style: GoogleFonts.oswald(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 2.6,
-                    ),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    IconButton(
-                      onPressed: () {
-                        _getData();
-                      },
-                      icon: const Icon(Icons.refresh),
-                    ),
-                  ],
-                ),
-                !_isLoading
-                    ? SliverToBoxAdapter(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              const Gap(12),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                child: Hero(
-                                  tag: 'search',
-                                  child: SearchTextField(
-                                    controller: _searchController,
-                                    hintText: 'Search',
-                                    onTap: () {
-                                      pushScreenWithNavBar(
-                                        context,
-                                        const SearchPage(),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                              CustomScrollView(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                slivers: [
-                                  SliverList.separated(
-                                    itemCount: collection.length + 1,
-                                    separatorBuilder: (context, index) =>
-                                        Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 8,
-                                      ),
-                                      child: Text(
-                                        tiles[index]['title'].toString(),
-                                        style: GoogleFonts.oswald(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    itemBuilder: (context, parentIndex) {
-                                      if (parentIndex == 0 ||
-                                          parentIndex ==
-                                              collection.length + 1) {
-                                        return Container();
-                                      }
-                                      final String collectionName =
-                                          collection[parentIndex - 1]
-                                              .toString();
-                                      var homeData = data[collectionName];
-
-                                      return SizedBox(
-                                        height: constraints.maxHeight * 0.18,
-                                        child: SingleChildScrollView(
-                                          scrollDirection: Axis.horizontal,
-                                          child: CustomScrollView(
-                                            scrollDirection: Axis.horizontal,
-                                            shrinkWrap: true,
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            slivers: [
-                                              SliverGrid.builder(
-                                                gridDelegate:
-                                                    const SliverGridDelegateWithFixedCrossAxisCount(
-                                                  crossAxisCount: 1,
-                                                  mainAxisSpacing: 0,
-                                                ),
-                                                itemCount: homeData.length,
-                                                itemBuilder:
-                                                    (context, childIndex) {
-                                                  String id =
-                                                      homeData[childIndex]['id']
-                                                          .toString();
-                                                  String thumbnailUrl =
-                                                      homeData[childIndex]
-                                                              ['image']
-                                                          .toString()
-                                                          .replaceAll('150x150',
-                                                              '500x500');
-                                                  String title =
-                                                      homeData[childIndex]
-                                                              ['title']
-                                                          .toString()
-                                                          .unescape();
-
-                                                  String type =
-                                                      homeData[childIndex]
-                                                              ['type']
-                                                          .toString();
-                                                  return GestureDetector(
-                                                    onTap: () async {
-                                                      _searchFocus.unfocus();
-                                                      if (type ==
-                                                          "radio_station") {
-                                                        var item = homeData[
-                                                            childIndex];
-                                                        await MediaManager()
-                                                            .playRadio(item);
-                                                      } else {
-                                                        pushWithNavBar(
-                                                          context,
-                                                          MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                PlaylistView(
-                                                              list: homeData[
-                                                                  childIndex],
-                                                            ),
-                                                          ),
-                                                        );
-                                                      }
-                                                    },
-                                                    child: Column(
-                                                      children: [
-                                                        type != "radio_station"
-                                                            ? Flexible(
-                                                                child: SizedBox(
-                                                                  child:
-                                                                      Container(
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              16.0), // Adjust the radius as needed
-                                                                      image:
-                                                                          DecorationImage(
-                                                                        image: CachedNetworkImageProvider(
-                                                                            thumbnailUrl),
-                                                                        fit: BoxFit
-                                                                            .contain,
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              )
-                                                            : Expanded(
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      CachedNetworkImageProvider(
-                                                                    thumbnailUrl,
-                                                                  ),
-                                                                  radius: 100,
-                                                                ),
-                                                              ),
-                                                        const Gap(4),
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                            horizontal: 20,
-                                                          ),
-                                                          child: Text(
-                                                            title,
-                                                            maxLines: 1,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: GoogleFonts
-                                                                .oswald(),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : const SliverToBoxAdapter(
-                        child: Center(
-                          child: LinearProgressIndicator(),
-                        ),
-                      ),
-              ],
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: SearchTextField(
+          controller: _searchController,
+          readOnly: true,
+          onTap: () {
+            pushScreenWithNavBar(context, const SearchPage());
+          },
+        ),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => _getData(),
+        child: !_isLoading
+            ? ListView(
+                children: songs
+                    .map((item) => HomePageTile(sectionIitem: item))
+                    .toList(),
+              )
+            : const Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

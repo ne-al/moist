@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:audio_service/audio_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:moist/app/screen/music_player.dart';
 import 'package:moist/app/screen/view/playlist_view.dart';
 import 'package:moist/app/theme/text_style.dart';
 import 'package:moist/core/helper/extension.dart';
@@ -25,8 +26,12 @@ class SearchTile extends StatelessWidget {
           MediaItem mediaItem = MapToMediaItem().mapToMediaItem(item);
 
           audioHandler.updateQueue([mediaItem]);
-
           audioHandler.play();
+
+          pushScreenWithoutNavBar(
+            context,
+            const MusicPlayer(),
+          );
         } else if (item['type'] == 'album') {
           pushScreenWithNavBar(context, PlaylistView(list: item));
         }
