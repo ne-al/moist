@@ -7,6 +7,10 @@ import 'package:moist/core/handler/audio_handler.dart';
 late AudioPlayerHandler audioHandler;
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  //! add flutter display mode later
+
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandlerImpl(),
     config: const AudioServiceConfig(
