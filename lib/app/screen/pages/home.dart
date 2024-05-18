@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage>
 
     data = await SaavnAPI().fetchHomePageData();
 
+    songs.clear();
     Map formatedData = await FormatResponse.formatPromoLists(data);
     Map modules = formatedData['modules'];
     modules.forEach((key, value) {
