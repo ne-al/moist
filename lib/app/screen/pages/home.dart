@@ -33,11 +33,11 @@ class _HomePageState extends State<HomePage>
     Box homeCache = Hive.box('homeCache');
     songs = await homeCache.get('homeData', defaultValue: []);
 
-    DateTime time = await homeCache.get('lastUpdated');
+    DateTime? time = await homeCache.get('lastUpdated', defaultValue: null);
 
-    var timeDiff = time.difference(DateTime.now()).inHours;
+    int? timeDiff = time?.difference(DateTime.now()).inHours;
 
-    if (timeDiff <= 2) {
+    if (timeDiff != null && timeDiff <= 2) {
       logger.e('Skip fetching home data $timeDiff');
       setState(() {});
       return;
