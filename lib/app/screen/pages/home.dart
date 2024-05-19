@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:logger/logger.dart';
 import 'package:moist/app/components/home_page_tile.dart';
 import 'package:moist/app/components/textfield/search/search_textfield.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage>
     with AutomaticKeepAliveClientMixin<HomePage> {
-  Map<dynamic, dynamic> data = {};
+  Map<dynamic, dynamic> homeData = {};
   List songs = [];
   Logger logger = Logger();
   bool _isLoading = false;
@@ -29,24 +30,49 @@ class _HomePageState extends State<HomePage>
   }
 
   Future<void> _getData() async {
+    Box homeCache = Hive.box('homeCache');
+    songs = await homeCache.get('homeData', defaultValue: []);
+
+    DateTime time = await homeCache.get('lastUpdated');
+
+    var timeDiff = time.difference(DateTime.now()).inHours;
+
+    if (timeDiff <= 2) {
+      logger.e('Skip fetching home data $timeDiff');
+      setState(() {});
+      return;
+    }
+
     setState(() {
-      _isLoading = true;
+      if (songs.isEmpty) {
+        _isLoading = true;
+      }
     });
 
-    data = await SaavnAPI().fetchHomePageData();
+    logger.w('fetching home data');
 
+    await fetchHomeData();
+
+    await Hive.box('homeCache').putAll({
+      'homeData': songs,
+      'lastUpdated': DateTime.now(),
+    });
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> fetchHomeData() async {
     songs.clear();
-    Map formatedData = await FormatResponse.formatPromoLists(data);
+    homeData = await SaavnAPI().fetchHomePageData();
+    Map formatedData = await FormatResponse.formatPromoLists(homeData);
     Map modules = formatedData['modules'];
     modules.forEach((key, value) {
       songs.add({
         'title': value['title'],
         'items': formatedData[key],
       });
-    });
-
-    setState(() {
-      _isLoading = false;
     });
   }
 
