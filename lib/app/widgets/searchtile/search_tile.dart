@@ -28,8 +28,10 @@ class SearchTile extends StatelessWidget {
             mediaItem,
             context,
           );
-        } else if (item['type'] == 'album') {
+        } else if (item['type'] == 'album' || item['type'] == 'playlist') {
           pushScreenWithNavBar(context, PlaylistView(list: item));
+        } else if (item['type'] == 'radio_station') {
+          MediaManager().playRadio(item, context);
         }
       },
       // onTap: () {

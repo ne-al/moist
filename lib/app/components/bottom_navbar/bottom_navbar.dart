@@ -19,7 +19,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         PersistentTabConfig(
           screen: const HomePage(),
           item: ItemConfig(
-            icon: const Icon(Icons.home),
+            icon: const Icon(Icons.home_rounded),
             title: "Home",
           ),
         ),
@@ -33,7 +33,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         PersistentTabConfig(
           screen: const SettingsPage(),
           item: ItemConfig(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.settings_rounded),
             title: "Settings",
           ),
         ),
