@@ -15,6 +15,7 @@ Future<void> main() async {
   MetadataGod.initialize();
   await FlutterDisplayMode.setHighRefreshRate();
   await Hive.openBox('homeCache');
+  await Hive.openBox('songHistory');
   audioHandler = await AudioService.init(
     builder: () => AudioPlayerHandlerImpl(),
     config: const AudioServiceConfig(

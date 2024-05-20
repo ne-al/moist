@@ -27,6 +27,7 @@ class SearchTile extends StatelessWidget {
           MediaManager().addAndPlay(
             mediaItem,
             context,
+            item,
           );
         } else if (item['type'] == 'album' || item['type'] == 'playlist') {
           pushScreenWithNavBar(context, PlaylistView(list: item));

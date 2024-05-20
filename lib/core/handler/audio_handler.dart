@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:moist/app/utils/history.dart';
 import 'package:moist/core/handler/queue_state.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -113,6 +114,23 @@ class AudioPlayerHandlerImpl extends BaseAudioHandler
 
   AudioPlayerHandlerImpl() {
     _init();
+    _listenForCurrentSongIndexChanges();
+  }
+
+  void _listenForCurrentSongIndexChanges() {
+    _player.currentIndexStream.listen((index) async {
+      final playlist = queue.value;
+
+      if (index == null || playlist.isEmpty) return;
+      if (_player.shuffleModeEnabled) {
+        index = _player.shuffleIndices!.indexOf(index);
+      }
+
+      if (index != 0) {
+        await addSongHistory(playlist[index].extras!);
+      }
+      mediaItem.add(playlist[index]);
+    });
   }
 
   Future<void> _init() async {

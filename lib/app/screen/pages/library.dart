@@ -10,6 +10,13 @@ class LibraryPage extends StatefulWidget {
 class _LibraryPageState extends State<LibraryPage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold(
+      body: Center(
+        child: Text(
+          'WORK IN PROGRESS\nWill be available in upcoming version',
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 }

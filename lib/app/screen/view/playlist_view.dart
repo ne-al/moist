@@ -87,9 +87,9 @@ class _PlaylistViewState extends State<PlaylistView> {
       }
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() {});
+
+    isLoading = false;
   }
 
   @override
@@ -168,7 +168,11 @@ class _PlaylistViewState extends State<PlaylistView> {
                             itemCount: mediaItem.length,
                             itemBuilder: (context, index) {
                               var song = mediaItem[index];
-                              return SongTile(song: song);
+                              Map songData = songMap['songs'][index];
+                              return SongTile(
+                                song: song,
+                                songMap: songData,
+                              );
                             },
                           )
                         : const SliverToBoxAdapter(

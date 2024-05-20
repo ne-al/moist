@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:moist/app/components/home_page_tile.dart';
 import 'package:moist/app/components/textfield/search/search_textfield.dart';
 import 'package:moist/app/screen/pages/search.dart';
+import 'package:moist/app/widgets/recently_played.dart';
 import 'package:moist/core/api/saavn/api.dart';
 import 'package:moist/core/helper/format.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent_bottom_nav_bar_v2.dart';
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage>
 
     logger.w('fetching home data');
 
-    await fetchHomeData();
+    songs = await fetchHomeData();
 
     await Hive.box('homeCache').putAll({
       'homeData': songs,
@@ -63,17 +64,19 @@ class _HomePageState extends State<HomePage>
     });
   }
 
-  Future<void> fetchHomeData() async {
-    songs.clear();
+  Future<List> fetchHomeData() async {
+    List songData = [];
     homeData = await SaavnAPI().fetchHomePageData();
     Map formatedData = await FormatResponse.formatPromoLists(homeData);
     Map modules = formatedData['modules'];
     modules.forEach((key, value) {
-      songs.add({
+      songData.add({
         'title': value['title'],
         'items': formatedData[key],
       });
     });
+
+    return songData;
   }
 
   @override
@@ -103,9 +106,11 @@ class _HomePageState extends State<HomePage>
                     ListView(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      children: songs
-                          .map((item) => HomePageTile(sectionIitem: item))
-                          .toList(),
+                      children: [
+                        const RecentlyPlayed(),
+                        ...songs
+                            .map((item) => HomePageTile(sectionIitem: item)),
+                      ],
                     ),
                   ],
                 ),

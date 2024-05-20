@@ -6,9 +6,11 @@ import 'package:moist/core/manager/media_manager.dart';
 
 class SongTile extends StatelessWidget {
   final MediaItem song;
+  final Map songMap;
   const SongTile({
     super.key,
     required this.song,
+    required this.songMap,
   });
 
   @override
@@ -47,6 +49,7 @@ class SongTile extends StatelessWidget {
             MediaManager().addAndPlay(
               song,
               context,
+              songMap,
             );
           },
         );

@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:moist/app/screen/music_player.dart';
+import 'package:moist/app/utils/history.dart';
 import 'package:moist/core/api/saavn/api.dart';
 import 'package:moist/core/helper/map_to_media_item.dart';
 import 'package:moist/main.dart';
@@ -30,15 +31,20 @@ class MediaManager {
       const MusicPlayer(),
     );
 
+    await addSongHistory(songs[0]);
+
     await audioHandler.updateQueue(mediaItems);
     audioHandler.play();
   }
 
-  Future<void> addAndPlay(MediaItem song, BuildContext context) async {
+  Future<void> addAndPlay(
+      MediaItem song, BuildContext context, Map songMap) async {
     pushScreenWithoutNavBar(
       context,
       const MusicPlayer(),
     );
+
+    await addSongHistory(songMap);
 
     if (audioHandler.mediaItem.value != song) {
       await audioHandler.updateQueue([song]);

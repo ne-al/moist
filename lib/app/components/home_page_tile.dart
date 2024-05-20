@@ -40,9 +40,14 @@ class _HomePageTileState extends State<HomePageTile> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Text(widget.sectionIitem['title'],
-              style: textStyle(context, bold: true)
-                  .copyWith(color: Theme.of(context).colorScheme.primary)),
+          child: Text(
+            widget.sectionIitem['title'],
+            style: textStyle(context, bold: true).copyWith(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 28,
+              letterSpacing: 0.4,
+            ),
+          ),
         ),
         const SizedBox(height: 8),
         SizedBox(
@@ -146,6 +151,7 @@ class _HomePageTileState extends State<HomePageTile> {
                             maxFontSize: 16,
                             overflow: TextOverflow.clip,
                             maxLines: 2,
+                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
